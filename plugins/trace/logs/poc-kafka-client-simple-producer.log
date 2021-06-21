@@ -1,0 +1,85 @@
+2021-06-11 16:41:41,336 [main] INFO  cl.kafka.fif.producer.conf.Log4jLoad - Carga de Log4j de propiedades OK
+2021-06-11 16:41:41,957 [main] INFO  io.jaegertracing.Configuration - Initialized tracer=JaegerTracer(version=Java-1.2.0, serviceName=APPS-WORKSHOP, reporter=CompositeReporter(reporters=[RemoteReporter(sender=UdpSender(), closeEnqueueTimeout=1000), LoggingReporter(logger=org.slf4j.impl.Log4jLoggerAdapter(io.jaegertracing.internal.reporters.LoggingReporter))]), sampler=ConstSampler(decision=true, tags={sampler.type=const, sampler.param=true}), tags={hostname=connect, jaeger.version=Java-1.2.0, ip=127.0.0.1}, zipkinSharedRpcSpan=false, expandExceptionLogs=false, useTraceId128Bit=false)
+2021-06-11 16:41:41,958 [main] INFO  cl.kafka.fif.producer.main.App - Inicializando Monitor Producer .
+2021-06-11 16:41:41,961 [main] INFO  cl.kafka.fif.producer.main.App - Carga propiedades finalizada.
+2021-06-11 16:41:42,009 [main] INFO  org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values: 
+	acks = 0
+	batch.size = 16384
+	bootstrap.servers = [kbroker:9091]
+	buffer.memory = 33554432
+	client.dns.lookup = default
+	client.id = PID_WORKSHOP_1
+	compression.type = none
+	connections.max.idle.ms = 540000
+	delivery.timeout.ms = 120000
+	enable.idempotence = false
+	interceptor.classes = []
+	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+	linger.ms = 0
+	max.block.ms = 60000
+	max.in.flight.requests.per.connection = 5
+	max.request.size = 1048576
+	metadata.max.age.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partitioner.class = class org.apache.kafka.clients.producer.internals.DefaultPartitioner
+	receive.buffer.bytes = 32768
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 2147483647
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.mechanism = GSSAPI
+	security.protocol = PLAINTEXT
+	send.buffer.bytes = 131072
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.1, TLSv1]
+	ssl.endpoint.identification.algorithm = https
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLS
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	transaction.timeout.ms = 60000
+	transactional.id = null
+	value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+
+2021-06-11 16:41:43,062 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka version : 2.1.0
+2021-06-11 16:41:43,062 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka commitId : eec43959745f444f
+2021-06-11 16:41:43,064 [main] INFO  cl.kafka.fif.producer.main.App - Cantidad de eventos->100
+2021-06-11 16:41:43,404 [main] INFO  io.jaegertracing.internal.reporters.LoggingReporter - Span reported: df5960a08a284127:df5960a08a284127:0:1 - TO_TOPIC_TEST_SOURCE
+2021-06-11 16:41:43,712 [kafka-producer-network-thread | PID_WORKSHOP_1] INFO  org.apache.kafka.clients.Metadata - Cluster ID: fBegqJssTEWrPJdjqui-8g
+2021-06-11 16:41:44,930 [main] INFO  io.jaegertracing.internal.reporters.LoggingReporter - Span reported: 1308a419649b40f4:1308a419649b40f4:0:1 - TO_TOPIC_TEST_SOURCE
+2021-06-11 16:41:45,933 [main] INFO  io.jaegertracing.internal.reporters.LoggingReporter - Span reported: d5eed3b61d31bbd7:d5eed3b61d31bbd7:0:1 - TO_TOPIC_TEST_SOURCE
+2021-06-11 16:41:46,940 [main] INFO  io.jaegertracing.internal.reporters.LoggingReporter - Span reported: d7f471700cdd45d0:d7f471700cdd45d0:0:1 - TO_TOPIC_TEST_SOURCE
+2021-06-11 16:41:47,947 [main] INFO  io.jaegertracing.internal.reporters.LoggingReporter - Span reported: 2bab851201c85e2b:2bab851201c85e2b:0:1 - TO_TOPIC_TEST_SOURCE
+2021-06-11 16:41:48,954 [main] INFO  io.jaegertracing.internal.reporters.LoggingReporter - Span reported: e1565fbc239ed5c6:e1565fbc239ed5c6:0:1 - TO_TOPIC_TEST_SOURCE
+2021-06-11 16:41:49,959 [main] INFO  io.jaegertracing.internal.reporters.LoggingReporter - Span reported: 16914c56042581ef:16914c56042581ef:0:1 - TO_TOPIC_TEST_SOURCE
+2021-06-11 16:41:50,964 [main] INFO  io.jaegertracing.internal.reporters.LoggingReporter - Span reported: 649d6751a3018859:649d6751a3018859:0:1 - TO_TOPIC_TEST_SOURCE
+2021-06-11 16:41:51,969 [main] INFO  io.jaegertracing.internal.reporters.LoggingReporter - Span reported: 6fd181bd95422f4d:6fd181bd95422f4d:0:1 - TO_TOPIC_TEST_SOURCE
+2021-06-11 16:41:52,972 [main] INFO  io.jaegertracing.internal.reporters.LoggingReporter - Span reported: a3a715889257ec10:a3a715889257ec10:0:1 - TO_TOPIC_TEST_SOURCE
+2021-06-11 16:41:53,979 [main] INFO  io.jaegertracing.internal.reporters.LoggingReporter - Span reported: 59cbbe8eac5158de:59cbbe8eac5158de:0:1 - TO_TOPIC_TEST_SOURCE
+2021-06-11 16:41:54,985 [main] INFO  io.jaegertracing.internal.reporters.LoggingReporter - Span reported: 355e6c3c4163c1a4:355e6c3c4163c1a4:0:1 - TO_TOPIC_TEST_SOURCE
+2021-06-11 16:41:55,991 [main] INFO  io.jaegertracing.internal.reporters.LoggingReporter - Span reported: 7ba6a689d4fb15a3:7ba6a689d4fb15a3:0:1 - TO_TOPIC_TEST_SOURCE

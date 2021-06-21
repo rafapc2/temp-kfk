@@ -1,0 +1,8 @@
+---
+startDelaySeconds: 0
+ssl: false
+lowercaseOutputName: false
+lowercaseOutputLabelNames: false
+jmxURL: service:jmx:rmi:///jndi/rmi://localhost:7070/jmxrmi
+rules:
+  - pattern: ".*"

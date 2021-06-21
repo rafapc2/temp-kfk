@@ -1,0 +1,501 @@
+openapi: 3.0.0
+info:
+  description: OAS para Kafka Connect Rest Interface
+  version: 1.0.0
+  title: Kafka Connect API
+servers:
+- url:  http://{server}:{port}/{basePath}
+  variables:
+    server:
+      default: ''
+      enum:
+        - 'localhost'
+    port:
+      default: '8083'
+    basePath:
+      default: v1/
+
+paths:
+  /:
+    get:
+      summary: Obtiene informacion del Cluster.
+      security:
+        - ApiKeyAuth: []      
+      tags: 
+        - Connectors
+      description: Entrega informacion sobre el cluster Connect  Version, Commit ID (git commit), Cluster ID.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              example: 
+                {
+                    "version":"5.5.0",
+                    "commit":"e5741b90cde98052",
+                    "kafka_cluster_id":"I4ZmrWqfT2e-upky_4fdPA"
+                  }
+
+  /connectors:
+    get:
+      summary: Obtiene los connectores del cluster.
+      security:
+        - ApiKeyAuth: []      
+      tags: 
+        - Connectors
+      description: Entrega informacion sobre los connectores existentes en el cluster, independiente de su estado.
+      responses:
+        "200":
+          description: OK  
+          content:
+            application/json:
+              example: 
+                    [
+                      "CONNECTOR_1",
+                      "CONNECTOR_5",
+                      "CONNECTOR_3",
+                      "CONNECTOR_10",
+                      "CONNECTOR_100"
+                    ]            
+    post:
+      summary: Crea un nuevo connector, devolviendo la info del connector recien creado.
+      tags: 
+        - Connectors
+      security:
+        - ApiKeyAuth: []  
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Request-create-connector"
+        description: Request payload en application/json.
+        required: true                                 
+      responses:
+        "201":
+          description: Creado
+          content:
+            application/json:
+              example:
+                      {
+                        "name": "NOMBRE_DEL_CONNECTOR",
+                        "config": {
+                            "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+                            "tasks.max": 1,
+                            "connection.user": "USER",
+                            "connection.password": "PASS",
+                            "connection.url": "jdbc:DRIVER://HOST:PUERTO",
+                            "topics": "TOPIC_DESTINO",
+                            "table.name.format": "NOMBRE_TABLA_BD",
+                            "pk.mode": "none",
+                            "insert.mode": "insert",
+                            "auto.evolve": "false",
+                            "auto.create": "false",
+                            "fields.whitelist": "COLUMNA1,COLUMNA2,COLUMNA3,....COLUMNAS",
+                            "batch.size":  100 ,
+                            "name": "NOMBRE_DEL_CONNECTOR"
+                        },
+                        "tasks": [
+                            {
+                                "connector": "NOMBRE_DEL_CONNECTOR",
+                                "task": 0
+                            }
+                        ],
+                        "type": "source"
+                    }
+        "400": 
+          description: Bad Request
+          content:
+            application/json:
+              example:
+                {
+                  "error_code": 400,
+                  "message": "Connector configuration is invalid and contains the following 7 error(s):\nMissing required configuration \"connection.url\" which has no default value.\nconnection.url cannot be null.\nconnection.url cannot be null.\nQuery mode must be specified\nQuery mode must be specified\nQuery mode must be specified\nMissing required configuration \"topic.prefix\" which has no default value.\nYou can also find the above list of errors at the endpoint `/{connectorType}/config/validate`"
+                }
+        "409":
+          description: Conflicto, posible rebalanceo en progreso.
+  /connectors/{connectorName}:
+    get:
+      summary: Obtiene informacion del connector -> connectorName.
+      security:
+        - ApiKeyAuth: []      
+      tags: 
+        - Connectors
+      description: Entrega informacion sobre los connectores existentes en el cluster, independiente de su estado.
+      parameters:
+        - name: connectorName
+          in: path
+          description: Nombre del connector.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Request-create-connector"
+
+  /connectors/{connectorName}/config:
+    get:
+      summary: Obtiene el status actual del connector.
+      security:
+        - ApiKeyAuth: []      
+      tags: 
+        - Connectors
+      description: Entrega informacion sobre el connector, sus Task , estados y donde se ejecuta cada uno.
+      parameters:
+        - name: connectorName
+          in: path
+          description: Nombre del connector.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK   
+          content:
+            application/json:
+              example:
+                {
+                    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+                    "tasks.max": 1,
+                    "connection.user": "USER",
+                    "connection.url": "jdbc:DRIVER://HOST:PUERTO",
+                    "topics": "TOPIC_DESTINO",
+                    "table.name.format": "NOMBRE_TABLA_BD",
+                    "pk.mode": "none",
+                    "insert.mode": "insert",
+                    "auto.evolve": "false",
+                    "auto.create": "false",
+                    "fields.whitelist": "COLUMNA1,COLUMNA2,COLUMNA3,....COLUMNAS",
+                    "batch.size":  100 # Cantidad de Registros por poll.
+                }
+    put:
+      summary: Actualiza la configuracion del connector.
+      security:
+        - ApiKeyAuth: []      
+      tags: 
+        - Connectors
+      description: Actualiza la configuracion del connector.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Request-upd-connector"
+        description: Request payload en application/json.
+        required: true    
+
+      parameters:
+        - name: connectorName
+          in: path
+          description: Nombre del connector.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK  
+        "409":
+          description: Conflicto, posible rebalanceo en progreso. 
+  /connectors/{connectorName}/status:
+    get:
+      summary: Obtiene el status actual del connector.
+      security:
+        - ApiKeyAuth: []      
+      tags: 
+        - Connectors
+      description: Entrega informacion sobre el connector, sus Task , estados y donde se ejecuta cada uno.
+      parameters:
+        - name: connectorName
+          in: path
+          description: Nombre del connector.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /connectors/{connectorName}/restart:
+    post:
+      summary: Reinicia el connector.
+      security:
+        - ApiKeyAuth: []      
+      tags: 
+        - Connectors
+      description: Reinicia el connector y cada uno de sus task.
+      parameters:
+        - name: connectorName
+          in: path
+          description: Nombre del connector.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+        "409":
+          description: Conflicto, posible rebalanceo en progreso.
+  /connectors/{connectorName}/pause:
+    put:
+      summary: Pausa el connector.
+      security:
+        - ApiKeyAuth: []      
+      tags: 
+        - Connectors
+      description: Pausa el connector y cada uno de sus task (async) hasta que el connector sea reanudado (resume) .
+      parameters:
+        - name: connectorName
+          in: path
+          description: Nombre del connector.
+          required: true
+          schema:
+            type: string
+      responses:
+        "202":
+          description: Aceptado    
+  /connectors/{connectorName}/resume:
+    put:
+      summary: Reanuda el connector pausado.
+      security:
+        - ApiKeyAuth: []      
+      tags: 
+        - Connectors
+      description: Reanuda el connector y cada uno de sus task .
+      parameters:
+        - name: connectorName
+          in: path
+          description: Nombre del connector.
+          required: true
+          schema:
+            type: string
+      responses:
+        "202":
+          description: Aceptado         
+  /connectors/{connectorName}/delete:
+    post:
+      summary: Elimina el connector.
+      security:
+        - ApiKeyAuth: []      
+      tags: 
+        - Connectors
+      description: Elimina el connector y cada uno de sus task.
+      parameters:
+        - name: connectorName
+          in: path
+          description: Nombre del connector.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+        "409":
+          description: Conflicto, posible rebalanceo en progreso.
+  /connectors/{connectorName}/tasks:
+    get:
+      summary: Los Task del connector.
+      security:
+        - ApiKeyAuth: []      
+      tags: 
+        - Tasks
+      description: Entrega informacion los Tasks ID (Lista), estados,donde se ejecuta cada uno, etc.
+      parameters:
+        - name: connectorName
+          in: path
+          description: Nombre del connector.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              example:
+                [{
+                    "id": {
+                      "connector": "{connectorName}",
+                      "task": 0
+                    },
+                    "config": {
+                                  "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+                                  "tasks.max": 1,
+                                  "connection.user": "USER",
+                                  "connection.url": "jdbc:DRIVER://HOST:PUERTO",
+                                  "topics": "TOPIC_DESTINO",
+                                  "table.name.format": "NOMBRE_TABLA_BD",
+                                  "pk.mode": "none",
+                                  "insert.mode": "insert",
+                                  "auto.evolve": "false",
+                                  "auto.create": "false",
+                                  "fields.whitelist": "COLUMNA1,COLUMNA2,COLUMNA3,....COLUMNAS",
+                                  "batch.size":  100 # Cantidad de Registros por poll.
+                              }
+                  }
+                ]
+
+
+
+  /connectors/{connectorName}/tasks/{idTask}/status:
+    get:
+      summary: Obtiene el estado del Task del connector.
+      security:
+        - ApiKeyAuth: []      
+      tags: 
+        - Tasks
+      description: Entrega informacion de Task para el connector.
+      parameters:
+        - name: connectorName
+          in: path
+          description: Nombre del connector.
+          required: true
+          schema:
+            type: string
+        - name: idTask
+          in: path
+          description: numero de task del connector.
+          required: true
+          schema:
+            type: integer            
+      responses:
+        "200":
+          description: OK          
+          content:
+            application/json:
+              example:
+                {
+                    "id": 0,
+                    "state": "RUNNING",
+                    "worker_id": "HOST:PORT"
+                }
+  /connectors/{connectorName}/tasks/{idTask}/restart:
+    post:
+      summary: Reinicia el Task individual del connector.
+      security:
+        - ApiKeyAuth: []      
+      tags: 
+        - Tasks
+      description: ''
+      parameters:
+        - name: connectorName
+          in: path
+          description: Nombre del connector.
+          required: true
+          schema:
+            type: string
+        - name: idTask
+          in: path
+          description: Numero de task del connector.
+          required: true
+          schema:
+            type: integer            
+      responses:
+        "200":
+          description: OK                 
+  /connectors-plugins:
+    get:
+      summary: Plugins disponibles para crear connectores.
+      tags: 
+        - Connectors Plugins
+      description: Entrega informacion sobre los plugins disponibles pra connectores.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              example:
+                [
+                  {
+                      "class": "com.google.pubsub.kafka.sink.CloudPubSubSinkConnector",
+                      "type": "sink",
+                      "version": "2.1.0-cp2"
+                  },
+                  {
+                      "class": "com.google.pubsub.kafka.source.CloudPubSubSourceConnector",
+                      "type": "source",
+                      "version": "2.1.0-cp2"
+                  },
+                  {
+                      "class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+                      "type": "source",
+                      "version": "5.1.1"
+                  },
+                  {
+                      "class": "org.apache.kafka.connect.file.FileStreamSinkConnector",
+                      "type": "sink",
+                      "version": "2.1.0-cp2"
+                  },
+                  {
+                      "class": "org.apache.kafka.connect.file.FileStreamSourceConnector",
+                      "type": "source",
+                      "version": "2.1.0-cp2"
+                  }
+              ]
+            
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: query
+      name: apikey
+    basicAuth:
+      type: http
+      description: HTTP Basic Authentication.
+      scheme: basic
+  schemas:
+    Error:
+      type: object
+      required:
+        - error_code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+
+    Request-create-connector:
+      example:
+                {
+                    "name": "NOMBRE_DEL_CONNECTOR",
+                    "config": {
+                        "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+                        "tasks.max": 1,
+                        "connection.user": "USER",
+                        "connection.password": "PASS",
+                        "connection.url": "jdbc:DRIVER://HOST:PUERTO",
+                        "topics": "TOPIC_DESTINO",
+                        "table.name.format": "NOMBRE_TABLA_BD",
+                        "pk.mode": "none",
+                        "insert.mode": "insert",
+                        "auto.evolve": "false",
+                        "auto.create": "false",
+                        "fields.whitelist": "COLUMNA1,COLUMNA2,COLUMNA3,....COLUMNAS",
+                        "batch.size":  100 
+                    }
+                }
+    Request-upd-connector:
+      example:
+                {
+                        "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+                        "tasks.max": 1,
+                        "connection.user": "USER",
+                        "connection.password": "PASS",
+                        "connection.url": "jdbc:DRIVER://HOST:PUERTO",
+                        "topics": "TOPIC_DESTINO",
+                        "table.name.format": "NOMBRE_TABLA_BD",
+                        "pk.mode": "none",
+                        "insert.mode": "insert",
+                        "auto.evolve": "false",
+                        "auto.create": "false",
+                        "fields.whitelist": "COLUMNA1,COLUMNA2,COLUMNA3,....COLUMNAS",
+                        "batch.size":  100 
+                    }
+                
+
+
+
